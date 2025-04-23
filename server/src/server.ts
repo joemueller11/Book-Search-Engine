@@ -1,10 +1,15 @@
 import express, { Request, Response } from 'express';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authMiddleware } from './services/auth.js';
 import db from './config/connection.js';
 import dotenv from 'dotenv';
+
+// Create __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
