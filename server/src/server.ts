@@ -1,9 +1,13 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import path from 'node:path';
 import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authMiddleware } from './services/auth.js';
 import db from './config/connection.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 async function startServer() {
   // Create an Express application
@@ -11,9 +15,9 @@ async function startServer() {
   const PORT = process.env.PORT || 3001;
 
   // Create a new Apollo server with the schema data
-  const server = new ApolloServer({ 
-    typeDefs, 
-    resolvers, 
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
     context: authMiddleware,
     cache: 'bounded',
     introspection: true // Enable playground in production
@@ -23,16 +27,17 @@ async function startServer() {
   await server.start();
 
   // Apply the Apollo GraphQL middleware to the Express app
-  server.applyMiddleware({ app });
+  // Cast app to any to bypass the type checking issue
+  server.applyMiddleware({ app: app as any, path: '/graphql' });
 
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  // Serve client/build as static assets in production
+  // Serve client/dist as static assets in production
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-    app.get('*', (req, res) => {
+    app.get('*', (_req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
     });
   }

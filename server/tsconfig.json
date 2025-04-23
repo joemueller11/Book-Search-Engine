@@ -3,11 +3,17 @@
   "compilerOptions": {
     /* Modules */
     "rootDir": "src" /* Specify the root folder within your source files. */,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
 
     /* Emit */
-    "outDir": "dist" /* Specify an output folder for all emitted files. */
+    "outDir": "dist" /* Specify an output folder for all emitted files. */,
     // "noEmitOnError": true /* Disable emitting files if any type checking errors are reported. */
+    
+    /* Type Declarations */
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck": true
   },
-  "include": ["src"],
-  "typeRoots": ["./node_modules/@types", "./src/types"]
+  "include": ["src"]
 }

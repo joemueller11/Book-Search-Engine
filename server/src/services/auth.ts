@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import type { VerifyErrors } from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -19,7 +20,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
     const secretKey = process.env.JWT_SECRET_KEY || '';
 
-    jwt.verify(token, secretKey, (err, user) => {
+    jwt.verify(token, secretKey, (err: VerifyErrors | null, user: any) => {
       if (err) {
         return res.sendStatus(403); // Forbidden
       }

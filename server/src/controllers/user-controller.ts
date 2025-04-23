@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 // import user model
 import User from '../models/User.js';
 // import sign token function from auth
-import { signToken } from '../services/auth.js';
+import { signToken, type JwtPayload } from '../services/auth.js';
 
 // get a single user by either their id or their username
 export const getSingleUser = async (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const createUser = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(400).json({ message: 'Something is wrong!' });
   }
-  const token = signToken(user.username, user.password, user._id);
+  const token = signToken(user.username, user.email, user._id);
   return res.json({ token, user });
 };
 
@@ -41,7 +41,7 @@ export const login = async (req: Request, res: Response) => {
   if (!correctPw) {
     return res.status(400).json({ message: 'Wrong password!' });
   }
-  const token = signToken(user.username, user.password, user._id);
+  const token = signToken(user.username, user.email, user._id);
   return res.json({ token, user });
 };
 
@@ -49,8 +49,12 @@ export const login = async (req: Request, res: Response) => {
 // user comes from `req.user` created in the auth middleware function
 export const saveBook = async (req: Request, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'You need to be logged in!' });
+    }
+    
     const updatedUser = await User.findOneAndUpdate(
-      { _id: req.user._id },
+      { _id: (req.user as JwtPayload)._id },
       { $addToSet: { savedBooks: req.body } },
       { new: true, runValidators: true }
     );
@@ -63,8 +67,12 @@ export const saveBook = async (req: Request, res: Response) => {
 
 // remove a book from `savedBooks`
 export const deleteBook = async (req: Request, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'You need to be logged in!' });
+  }
+  
   const updatedUser = await User.findOneAndUpdate(
-    { _id: req.user._id },
+    { _id: (req.user as JwtPayload)._id },
     { $pull: { savedBooks: { bookId: req.params.bookId } } },
     { new: true }
   );
