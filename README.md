@@ -12,7 +12,7 @@ Book Search Engine that allows users to make a profile, search for books, save a
 
 ## Installation
 Install Node.js for dependencies. <br/>
-Express.js<br/>
+MERN<br/>
 jwt-decode<br/>
 GraphQL
 
